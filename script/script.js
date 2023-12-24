@@ -8,6 +8,7 @@ function Gameboard() {
     const rows = 3;
     const columns = 3;
     const board = [];
+    let unmarkedCells = 0;
 
     // Create a 2d array that will represent the state of the game board.
     // Row 0 will represent the top row and
@@ -17,17 +18,24 @@ function Gameboard() {
         board[i] = [];
         for (let j = 0; j < columns; j++) {
             board[i].push(Cell());
+            unmarkedCells++;
         }
     }
 
     // This method will get the entire board that the UI will use to render.
     const getBoard = () => board;
 
+    const getRows = () => rows;
+    const getColumns = () => columns;
+
     // In order to draw a symbol, we need to get the Cell
     // and check whether the Cell has already been marked by a symbol.
     const drawSymbol = (x, y, player) => {
         let cell = getCellAt(x, y);
-        if(cell.getValue() === 0) cell.addSymbol(player);
+        if(cell.getValue() === 0) {
+            cell.addSymbol(player);
+            unmarkedCells--;
+        }
     }
 
     // This method will be used to print our board to the console.
@@ -44,10 +52,12 @@ function Gameboard() {
     }
 
     const getCellAt = (x, y) => {
-        return board[x][y];
+        return board[y][x];
     };
 
-    return { getBoard, drawSymbol, printBoard };
+    const getUnmarkedCounts = () => unmarkedCells;
+
+    return { getBoard, drawSymbol, printBoard, getUnmarkedCounts, getRows, getColumns };
 }
 
 /*
@@ -85,7 +95,7 @@ function GameController(
     playerOneName = "Player One",
     playerTwoName = "Player Two"
 ) {
-    const board = Gameboard();
+    const gameBoard = Gameboard();
     const players = [
         {
             name: playerOneName,
@@ -107,27 +117,89 @@ function GameController(
     const getActivePlayer = () => activePlayer;
 
     const printNewRound = () => {
-        board.printBoard();
+        gameBoard.printBoard();
         console.log(`${getActivePlayer().name}'s turn.`);
+    };
+
+    const printGameover = (gameState) => {
+        gameBoard.printBoard();
+        if (gameState === "TIE") console.log(`It's a ${gameState}!`);
+        else console.log(`${getActivePlayer().name} has WON!`);
     };
 
     const playRound = (x, y) => {
         console.log(`Marking ${getActivePlayer().name}'s symbol, ${getActivePlayer().symbol} into square at position, x:${x} y:${y}`);
-        board.drawSymbol(x, y, getActivePlayer().symbol);
+        gameBoard.drawSymbol(x, y, getActivePlayer().symbol);
 
         // Check for winner and so forth. 
         // If not, proceed to next turn.
-
-        switchPlayerTurn();
-        printNewRound();
+        const gameState = checkGameState(x,y);
+        if (gameState === "WIN" || gameState === "TIE"){
+            printGameover(gameState);
+        } else {
+            switchPlayerTurn();
+            printNewRound();
+        }
     };
+
+    const checkGameState = (xLast, yLast) => {
+        const board = gameBoard.getBoard();
+        const currentSymbol = getActivePlayer().symbol;
+        const rows = gameBoard.getRows();
+        const columns = gameBoard.getColumns();
+        
+        // Look for a "HORIZONTAL" win state on the row of last player input.
+        let symbolCount = 0;
+        for (let j = 0; j < columns; j++) {
+            if(board[yLast][j].getValue() === currentSymbol) symbolCount++;
+        }
+        if (symbolCount === 3) return "WIN";
+        
+        // Look for "VERTICAL" win state.
+        symbolCount = 0;
+        for (let i = 0; i < rows; i++) {
+            if(board[i][xLast].getValue() === currentSymbol) symbolCount++;
+        }
+        if (symbolCount === 3) return "WIN";
+        
+        // Look for "DIAGONAL" win state.
+        const isCenterCell = (xLast === yLast && xLast === 1);
+        
+        // Look for (\) "DIAGONAL" win state.
+        symbolCount = 0;
+        if(isCenterCell || xLast === yLast){
+            for (let i =  0; i < rows; i++) {
+                for (let j = 0; j < columns; j++) {
+                    if (i === j && board[i][j].getValue() === currentSymbol) symbolCount++;
+                }
+            }
+            if (symbolCount === 3) return "WIN";
+        }
+
+        // Look for (/) "DIAGONAL" win state.
+        symbolCount = 0;
+        if(isCenterCell || xLast+yLast === 2){
+            for (let i =  0; i < rows; i++) {
+                for (let j = 0; j < columns; j++) {
+                    if (i + j === 2 && board[i][j].getValue() === currentSymbol) symbolCount++;
+                }
+            }
+            if (symbolCount === 3) return "WIN";
+        }
+
+        // Look for unmarked space. 
+        // If none, return "TIE" state. 
+        // If found, return "ONGOING" state.
+        if (gameBoard.getUnmarkedCounts === 0) return "TIE";
+    }
 
     // Initialization at game start
     printNewRound();
 
     return {
         playRound,
-        getActivePlayer
+        getActivePlayer,
+        checkGameState
     };
 
 }
