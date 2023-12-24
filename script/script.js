@@ -25,15 +25,27 @@ function Gameboard() {
 
     // In order to draw a symbol, we need to get the Cell
     // and check whether the Cell has already been marked by a symbol.
-    const drawSymbol = (Cell, player) => {
-        if(Cell.getValue() === 0) Cell.addSymbol(player);
+    const drawSymbol = (x, y, player) => {
+        let cell = getCellAt(x, y);
+        if(cell.getValue() === 0) cell.addSymbol(player);
     }
 
     // This method will be used to print our board to the console.
     // Will not be needed after UI is implemented.
     const printBoard = () => {
-        console.log(board);
+        let printedBoard = "<Board>";
+        for (let i =  0; i < rows; i++) {
+            printedBoard += "\n";
+            for (let j = 0; j < columns; j++) {
+                printedBoard = printedBoard + " " + board[i][j].getValue();
+            }
+        }
+        console.log(printedBoard);
     }
+
+    const getCellAt = (x, y) => {
+        return board[x][y];
+    };
 
     return { getBoard, drawSymbol, printBoard };
 }
@@ -99,9 +111,9 @@ function GameController(
         console.log(`${getActivePlayer().name}'s turn.`);
     };
 
-    const playRound = (Cell) => {
-        console.log(`Marking ${getActivePlayer().name}'s symbol into square`);
-        board.drawSymbol(Cell, getActivePlayer().symbol);
+    const playRound = (x, y) => {
+        console.log(`Marking ${getActivePlayer().name}'s symbol, ${getActivePlayer().symbol} into square at position, x:${x} y:${y}`);
+        board.drawSymbol(x, y, getActivePlayer().symbol);
 
         // Check for winner and so forth. 
         // If not, proceed to next turn.
