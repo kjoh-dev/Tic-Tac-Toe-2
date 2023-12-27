@@ -93,9 +93,14 @@ function Cell(){
 
 function GameController(
     playerOneName = "Player One",
-    playerTwoName = "Player Two"
+    playerTwoName = "Player Two",
+    // difficulty = "Easy"
 ) {
     const gameBoard = Gameboard();
+    const board = gameBoard.getBoard();
+    const rows = gameBoard.getRows();
+    const columns = gameBoard.getColumns();
+
     const players = [
         {
             name: playerOneName,
@@ -134,64 +139,159 @@ function GameController(
         // Check for winner and so forth. 
         // If not, proceed to next turn.
         const gameState = checkGameState(x,y);
-        if (gameState === "WIN" || gameState === "TIE"){
+        if (gameState !== "ONGOING"){
             printGameover(gameState);
         } else {
             switchPlayerTurn();
             printNewRound();
+
+            // if (activePlayer.name === "AI"){
+            //     AIPlayRound(difficulty);
+            // }
         }
     };
 
-    const checkGameState = (xLast, yLast) => {
-        const board = gameBoard.getBoard();
-        const currentSymbol = getActivePlayer().symbol;
-        const rows = gameBoard.getRows();
-        const columns = gameBoard.getColumns();
-        
-        // Look for a "HORIZONTAL" win state on the row of last player input.
-        let symbolCount = 0;
-        for (let j = 0; j < columns; j++) {
-            if(board[yLast][j].getValue() === currentSymbol) symbolCount++;
-        }
-        if (symbolCount === 3) return "WIN";
-        
-        // Look for "VERTICAL" win state.
-        symbolCount = 0;
-        for (let i = 0; i < rows; i++) {
-            if(board[i][xLast].getValue() === currentSymbol) symbolCount++;
-        }
-        if (symbolCount === 3) return "WIN";
-        
-        // Look for "DIAGONAL" win state.
-        const isCenterCell = (xLast === yLast && xLast === 1);
-        
-        // Look for (\) "DIAGONAL" win state.
-        symbolCount = 0;
-        if(isCenterCell || xLast === yLast){
-            for (let i =  0; i < rows; i++) {
-                for (let j = 0; j < columns; j++) {
-                    if (i === j && board[i][j].getValue() === currentSymbol) symbolCount++;
-                }
+    // const AIPlayRound = (difficulty) => {
+    //     const selectedXY = [];
+    //     switch (difficulty){
+    //         case "Easy":{
+    //                 const unmarkedCells = getUnmarkedCells();
+    //                 const selectedCell = unmarkedCells[Math.floor(Math.random() * unmarkedCells.length)];
+    //                 selectedXY[0] = selectedCell.x;
+    //                 selectedXY[1] = selectedCell.y;
+    //             }
+    //             break;
+    //         case "Hard":
+    //         default:{
+    //             // Check for a winning move (two own symbols in line)
+
+    //             // Check for a losing move (two opponent symbols in line)
+
+    //             // Check for center
+
+    //             // Check for corners
+    //         }
+    //         break;
+    //     }
+
+    //     playRound(selectedXY[0], selectedXY[1]);
+    // }
+
+    const getUnmarkedCells = () => {
+        const unmarkedCells = [];
+        for (let i =  0; i < rows; i++) {
+            for (let j = 0; j < columns; j++) {
+                if (board[i][j].getValue() === 0) unmarkedCells.push({x: j, y: i});
             }
-            if (symbolCount === 3) return "WIN";
+        }
+        return unmarkedCells;
+    }
+
+    const checkRow = (y) => {
+        const unmarked = [];
+        const oneMarked = [];
+        const twoMarked = [];
+
+        for (let x = 0; x < columns; x++) {
+            const cellSymbol = board[y][x].getValue();
+            if(cellSymbol === players[0].symbol) oneMarked.push({ x, y });
+            else if (cellSymbol === players[1].symbol) twoMarked.push({ x, y });
+            else unmarked.push({ x, y });
         }
 
-        // Look for (/) "DIAGONAL" win state.
-        symbolCount = 0;
-        if(isCenterCell || xLast+yLast === 2){
-            for (let i =  0; i < rows; i++) {
-                for (let j = 0; j < columns; j++) {
-                    if (i + j === 2 && board[i][j].getValue() === currentSymbol) symbolCount++;
+        return { unmarked, oneMarked, twoMarked };
+    };
+
+    const checkColumn = (x) => {
+        const unmarked = [];
+        const oneMarked = [];
+        const twoMarked = [];
+
+        for (let y = 0; y < rows; y++) {
+            const cellSymbol = board[y][x].getValue();
+            if(cellSymbol === players[0].symbol) oneMarked.push({ x, y });
+            else if (cellSymbol === players[1].symbol) twoMarked.push({ x, y });
+            else unmarked.push({ x, y });
+        }
+
+        return { unmarked, oneMarked, twoMarked };
+    };
+
+    const checkDiagonalFwd = () => {
+        const unmarked = [];
+        const oneMarked = [];
+        const twoMarked = [];
+
+        for (let y =  0; y < rows; y++) {
+            for (let x = 0; x < columns; x++) {
+                if (x + y === 2){
+                    const cellSymbol = board[y][x].getValue();
+                    if(cellSymbol === players[0].symbol) oneMarked.push({ x, y });
+                    else if (cellSymbol === players[1].symbol) twoMarked.push({ x, y });
+                    else unmarked.push({ x, y });
                 }
             }
-            if (symbolCount === 3) return "WIN";
+        }
+
+        return { unmarked, oneMarked, twoMarked };
+    };
+
+    const checkDiagonalBwd = () => {
+        const unmarked = [];
+        const oneMarked = [];
+        const twoMarked = [];
+
+        for (let y =  0; y < rows; y++) {
+            for (let x = 0; x < columns; x++) {
+                if (y === x){
+                    const cellSymbol = board[y][x].getValue();
+                    if(cellSymbol === players[0].symbol) oneMarked.push({ x, y });
+                    else if (cellSymbol === players[1].symbol) twoMarked.push({ x, y });
+                    else unmarked.push({ x, y });
+                }
+            }
+        }
+
+        return { unmarked, oneMarked, twoMarked };
+    };
+
+    const checkGameState = (xLast, yLast) => {
+        const currentSymbol = getActivePlayer().symbol;
+        let result;
+        // Look for a "HORIZONTAL" win state on the row of last player input.
+        result = checkRow(yLast);
+        if(getActivePlayer().symbol === players[0].symbol && result.oneMarked.length === 3) return "WIN";
+        if(getActivePlayer().symbol === players[1].symbol && result.twoMarked.length === 3) return "WIN";
+
+        // Look for "VERTICAL" win state.
+        result = checkColumn(xLast);
+        if(getActivePlayer().symbol === players[0].symbol && result.oneMarked.length === 3) return "WIN";
+        if(getActivePlayer().symbol === players[1].symbol && result.twoMarked.length === 3) return "WIN";
+        
+        // Look for (\) "DIAGONAL" win state.
+        if(xLast === yLast){
+            result = checkDiagonalBwd();
+            if(getActivePlayer().symbol === players[0].symbol && result.oneMarked.length === 3) return "WIN";
+            if(getActivePlayer().symbol === players[1].symbol && result.twoMarked.length === 3) return "WIN";
+        }
+        
+        // Look for (/) "DIAGONAL" win state.
+        if(xLast + yLast === 2){
+            result = checkDiagonalFwd();
+            if(getActivePlayer().symbol === players[0].symbol && result.oneMarked.length === 3) return "WIN";
+            if(getActivePlayer().symbol === players[1].symbol && result.twoMarked.length === 3) return "WIN";
         }
 
         // Look for unmarked space. 
         // If none, return "TIE" state. 
         // If found, return "ONGOING" state.
         if (gameBoard.getUnmarkedCounts === 0) return "TIE";
+
+        return "ONGOING";
+
     }
+
+    
 
     // Initialization at game start
     printNewRound();
