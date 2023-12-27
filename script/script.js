@@ -93,8 +93,8 @@ function Cell(){
 
 function GameController(
     playerOneName = "Player One",
-    playerTwoName = "Player Two",
-    // difficulty = "Easy"
+    playerTwoName = "AI",
+    difficulty = "Hard"
 ) {
     const gameBoard = Gameboard();
     const board = gameBoard.getBoard();
@@ -145,37 +145,121 @@ function GameController(
             switchPlayerTurn();
             printNewRound();
 
-            // if (activePlayer.name === "AI"){
-            //     AIPlayRound(difficulty);
-            // }
+            if (activePlayer.name === "AI"){
+                AIPlayRound(difficulty);
+            }
         }
     };
 
-    // const AIPlayRound = (difficulty) => {
-    //     const selectedXY = [];
-    //     switch (difficulty){
-    //         case "Easy":{
-    //                 const unmarkedCells = getUnmarkedCells();
-    //                 const selectedCell = unmarkedCells[Math.floor(Math.random() * unmarkedCells.length)];
-    //                 selectedXY[0] = selectedCell.x;
-    //                 selectedXY[1] = selectedCell.y;
-    //             }
-    //             break;
-    //         case "Hard":
-    //         default:{
-    //             // Check for a winning move (two own symbols in line)
+    const AIPlayRound = (difficulty) => {
+        const selectedXY = [];
+        switch (difficulty){
+            case "Easy":{
+                    const unmarkedCells = getUnmarkedCells();
+                    const selectedCell = unmarkedCells[Math.floor(Math.random() * unmarkedCells.length)];
+                    selectedXY[0] = selectedCell.x;
+                    selectedXY[1] = selectedCell.y;
+                }
+                break;
+            case "Hard":
+            default:{
+                const AIMark = players[0].name === activePlayer.name ? "oneMarked" : "twoMarked";
+                const oppMark = AIMark === "twoMarked" ? "oneMarked" : "twoMarked";
+                let result;
+                const resultDefense = [];
+                
+                // Check for a winning move (two own symbols in line)
+                if(selectedXY.length === 0){
+                    for (let y = 0; y < rows; y++){
+                        result = checkRow(y);
+    
+                        if(result.unmarked.length === 1 && result[AIMark].length === 2) {
+                            selectedXY[0] = result.unmarked[0].x;
+                            selectedXY[1] = result.unmarked[0].y;
+                            break;
+                        }
+                        if(result.unmarked.length === 1 && result[oppMark].length === 2) {
+                            resultDefense.push(result.unmarked[0]);
+                        }
+                    }
+                }
 
-    //             // Check for a losing move (two opponent symbols in line)
+                if(selectedXY.length === 0){
+                    for (let x = 0; x < columns; x++){
+                        result = checkColumn(x);
+    
+                        if(result.unmarked.length === 1 && result[AIMark].length === 2) {
+                            selectedXY[0] = result.unmarked[0].x;
+                            selectedXY[1] = result.unmarked[0].y;
+                            break;
+                        }
+                        if(result.unmarked.length === 1 && result[oppMark].length === 2) {
+                            resultDefense.push(result.unmarked[0]);
+                        }
+                    }
+                }
 
-    //             // Check for center
+                if(selectedXY.length === 0){
+                    result = checkDiagonalFwd();
 
-    //             // Check for corners
-    //         }
-    //         break;
-    //     }
+                    if(result.unmarked.length === 1 && result[AIMark].length === 2) {
+                        selectedXY[0] = result.unmarked[0].x;
+                        selectedXY[1] = result.unmarked[0].y;
+                        break;
+                    }
+                    if(result.unmarked.length === 1 && result[oppMark].length === 2) {
+                        resultDefense.push(result.unmarked[0]);
+                    }
+                }
 
-    //     playRound(selectedXY[0], selectedXY[1]);
-    // }
+                if(selectedXY.length === 0){
+                    result = checkDiagonalBwd();
+
+                    if(result.unmarked.length === 1 && result[AIMark].length === 2) {
+                        selectedXY[0] = result.unmarked[0].x;
+                        selectedXY[1] = result.unmarked[0].y;
+                        break;
+                    }
+                    if(result.unmarked.length === 1 && result[oppMark].length === 2) {
+                        resultDefense.push(result.unmarked[0]);
+                    }
+                }
+
+                if(selectedXY.length !== 0) break;
+
+                // Check for a losing move (two opponent symbols in line)
+                if(resultDefense.length > 0){
+                    if(resultDefense.includes({ x: 1, y: 1 })){
+                        selectedXY[0] = 1;
+                        selectedXY[1] = 1;
+                    } else {
+                        selectedXY[0] = resultDefense[0].x;
+                        selectedXY[1] = resultDefense[0].y;
+                    }
+
+                    break;
+                }
+
+                // Check for center and Check for corners if necessary
+                const unmarkedCells = getUnmarkedCells();
+                if(unmarkedCells.includes({ x: 1, y: 1 })){
+                    selectedXY[0] = 1;
+                    selectedXY[1] = 1;
+                } else {
+                    for (let i = 0; i < unmarkedCells.length; i++){
+                        selectedXY[0] = unmarkedCells[i].x;
+                        selectedXY[1] = unmarkedCells[i].y;
+                        if(selectedXY[0] === selectedXY[1]) break;
+                        if(selectedXY[0] + selectedXY[1] === 2) break;
+                    }
+                }
+
+            }
+            break;
+        }
+
+        playRound(selectedXY[0], selectedXY[1]);
+    }
 
     const getUnmarkedCells = () => {
         const unmarkedCells = [];
