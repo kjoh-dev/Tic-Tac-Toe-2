@@ -229,7 +229,7 @@ function GameController(
 
                 // Check for a losing move (two opponent symbols in line)
                 if(resultDefense.length > 0){
-                    if(resultDefense.includes({ x: 1, y: 1 })){
+                    if(resultDefense.some((cell) => cell.x === 1 && cell.y === 1)){
                         selectedXY[0] = 1;
                         selectedXY[1] = 1;
                     } else {
@@ -242,13 +242,14 @@ function GameController(
 
                 // Check for center and Check for corners if necessary
                 const unmarkedCells = getUnmarkedCells();
-                if(unmarkedCells.includes({ x: 1, y: 1 })){
+                if(unmarkedCells.some((cell) => cell.x === 1 && cell.y === 1)){
                     selectedXY[0] = 1;
                     selectedXY[1] = 1;
                 } else {
                     for (let i = 0; i < unmarkedCells.length; i++){
                         selectedXY[0] = unmarkedCells[i].x;
                         selectedXY[1] = unmarkedCells[i].y;
+
                         if(selectedXY[0] === selectedXY[1]) break;
                         if(selectedXY[0] + selectedXY[1] === 2) break;
                     }
@@ -265,7 +266,7 @@ function GameController(
         const unmarkedCells = [];
         for (let i =  0; i < rows; i++) {
             for (let j = 0; j < columns; j++) {
-                if (board[i][j].getValue() === 0) unmarkedCells.push({x: j, y: i});
+                if (board[i][j].getValue() === 0) unmarkedCells.push({ x: j, y: i });
             }
         }
         return unmarkedCells;
