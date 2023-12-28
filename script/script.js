@@ -146,7 +146,7 @@ function GameController(
             printNewRound();
 
             if (activePlayer.name === "AI"){
-                AIPlayRound(difficulty);
+                setTimeout(() => { AIPlayRound(difficulty); }, 2000);
             }
         }
     };
