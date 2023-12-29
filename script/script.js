@@ -100,6 +100,7 @@ function GameController(
     const board = gameBoard.getBoard();
     const rows = gameBoard.getRows();
     const columns = gameBoard.getColumns();
+    const aiDelayTime = 1500;
 
     const players = [
         {
@@ -146,7 +147,7 @@ function GameController(
             printNewRound();
 
             if (activePlayer.name === "AI"){
-                setTimeout(() => { AIPlayRound(difficulty); }, 2000);
+                setTimeout(() => { AIPlayRound(difficulty); }, aiDelayTime);
             }
         }
     };
