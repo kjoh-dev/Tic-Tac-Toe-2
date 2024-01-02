@@ -1,0 +1,76 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+}
+
+body {
+    font-family: 'Teachers Student', 'Courier New', Courier, monospace;
+    font-size: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+}
+
+#board {
+    background-color: black;
+    font-family: 'Chalk', 'Courier New', Courier, monospace;
+    color: whitesmoke;
+    display: grid;
+    gap: 0.5rem;
+    grid-template-columns: repeat(3, 5rem);
+    grid-template-rows: repeat(3, 5rem);
+}
+
+.cell {
+    background-color: white;
+    box-shadow: 0px 0px 2px 2.5px white;
+    color: black;
+    width: 100%;
+    height: 100%;
+
+    font-size: 6rem;
+    display: grid;
+    align-content: center;
+    justify-content: center;
+
+}
+
+#players {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: start;
+    
+    --normal-padding: 0rem 0rem 0rem 0rem;
+    --normal-border-style: none;
+    --normal-font-size: 2.5rem;
+    
+    --emphasis-padding: 0rem 1rem 0rem 1rem;
+    --emphasis-border-style: dashed;
+    --emphasis-font-size: 4rem;
+}
+
+#player-x, #player-o {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    font-size: 4rem;
+}
+
+#player-x {
+    /* font-size: var(--normal-font-size);
+    padding: var(--normal-padding);
+    border-style: var(--normal-border-style); */
+}
+
+#player-o {
+    /* font-size: var(--emphasis-font-size);
+    padding: var(--emphasis-padding);
+    border-style: var(--emphasis-border-style); */
+}
+
+#x-symbol, #o-symbol {
+    font-family: 'Chalk', 'Courier New', Courier, monospace;
+    /* font-size: 4rem; */
+}
+
