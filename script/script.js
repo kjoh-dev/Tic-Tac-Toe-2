@@ -394,7 +394,7 @@ function GameController() {
     };
 
     const checkGameState = (xLast, yLast) => {
-        const currentSymbol = getActivePlayer().symbol;
+        // const currentSymbol = getActivePlayer().symbol;
         let result;
         // Look for a "HORIZONTAL" win state on the row of last player input.
         result = checkRow(yLast);
@@ -423,7 +423,7 @@ function GameController() {
         // Look for unmarked space. 
         // If none, return "TIE" state. 
         // If found, return "ONGOING" state.
-        if (gameBoard.getUnmarkedCounts === 0) return "TIE";
+        if (gameBoard.getUnmarkedCounts() === 0) return "TIE";
 
         return "ONGOING";
 
