@@ -8,7 +8,7 @@ function Gameboard() {
     const rows = 3;
     const columns = 3;
     const board = [];
-    let unmarkedCells = 0;
+    let unmarkedCells = rows * columns;
 
     // Create a 2d array that will represent the state of the game board.
     // Row 0 will represent the top row and
@@ -17,8 +17,7 @@ function Gameboard() {
     for (let i =  0; i < rows; i++) {
         board[i] = [];
         for (let j = 0; j < columns; j++) {
-            board[i].push(Cell());
-            unmarkedCells++;
+            board[i].push(Cell(i*3+j));
         }
     }
 
@@ -32,11 +31,21 @@ function Gameboard() {
     // and check whether the Cell has already been marked by a symbol.
     const drawSymbol = (x, y, player) => {
         let cell = getCellAt(x, y);
-        if(cell.getValue() === 0) {
+        if(cell.getValue() === "") {
             cell.addSymbol(player);
             unmarkedCells--;
         }
     }
+
+    const resetBoard = () => {
+        for (let i =  0; i < rows; i++) {
+            for (let j = 0; j < columns; j++) {
+                getCellAt(j, i).addSymbol();
+            }
+        }
+
+        unmarkedCells = rows * columns;
+    }   
 
     // This method will be used to print our board to the console.
     // Will not be needed after UI is implemented.
@@ -57,7 +66,7 @@ function Gameboard() {
 
     const getUnmarkedCounts = () => unmarkedCells;
 
-    return { getBoard, drawSymbol, printBoard, getUnmarkedCounts, getRows, getColumns };
+    return { getBoard, drawSymbol, resetBoard, printBoard, getUnmarkedCounts, getRows, getColumns };
 }
 
 /*
@@ -68,16 +77,20 @@ function Gameboard() {
 ** 2: Player 2's symbol.
 */
 
-function Cell(){
-    let value = 0;
+function Cell(idNumber){
+    // let value = 0;
+    const cellElem = document.getElementById("cell-" + idNumber);
+    cellElem.addEventListener("click", markCell);
+    // cellEvent.addEventListener("click", () => { console.log("clicked"); });
 
     // Accept a player's symbol to change the value of the Cell.
-    const addSymbol = (player) => {
-        value = player;
+    const addSymbol = (player = "") => {
+        console.log(`player symbol: ${player}`);
+        cellElem.innerText = player;
     };
 
     // Method for retrieving the current Cell value using closure.
-    const getValue = () => value;
+    const getValue = () => cellElem.innerText;
 
     return {
         addSymbol,
@@ -91,29 +104,57 @@ function Cell(){
 ** anybody has won the game.
 */
 
-function GameController(
-    playerOneName = "Player One",
-    playerTwoName = "AI",
-    difficulty = "Hard"
-) {
-    const gameBoard = Gameboard();
-    const board = gameBoard.getBoard();
-    const rows = gameBoard.getRows();
-    const columns = gameBoard.getColumns();
-    const aiDelayTime = 1500;
+function GameController() {
 
-    const players = [
-        {
-            name: playerOneName,
-            symbol: 1
-        },
-        {
-            name: playerTwoName,
-            symbol: 2
-        }
-    ];
+    let difficulty;
+    let gameBoard;
+    let board;
+    let rows;
+    let columns;
+    let aiDelayTime = 1500;
+    let players;
+    let activePlayer;
 
-    let activePlayer = players[0];
+    const setPlayers = (playerOneName = "PlayerOne", playerTwoName = "AI") => {
+        players = [
+            {
+                name: playerOneName,
+                symbol: "X"
+            },
+            {
+                name: playerTwoName,
+                symbol: "O"
+            }
+        ];
+        activePlayer = players[0];
+
+    };
+
+    const setDifficulty = (difficulty = "Hard") => {
+        this.difficulty = difficulty;
+    };
+
+    const initGame = () => {
+        gameBoard = Gameboard();
+        board = gameBoard.getBoard();
+        rows = gameBoard.getRows();
+        columns = gameBoard.getColumns();
+
+        setPlayers();
+        setDifficulty();
+    };
+
+    const resetGame = () => {
+        gameBoard.resetBoard();
+    };
+    
+    const startGame = (playerOneName, playerTwoName, difficulty) => {
+        setPlayers(playerOneName, playerTwoName);
+        setDifficulty(difficulty);
+            
+        // Initialization at game start
+        printNewRound();
+    };
 
     const switchPlayerTurn = () => {
         activePlayer = activePlayer === players[0] ? players[1] :
@@ -133,7 +174,17 @@ function GameController(
         else console.log(`${getActivePlayer().name} has WON!`);
     };
 
-    const playRound = (x, y) => {
+    const playRound = (cellID) => {
+        // console.log(cellID instanceof String);
+        // console.log(cellID.slice(-1));
+        // console.log(Number(cellID.slice(-1)));
+        const id = typeof cellID === "string" ? Number(cellID.slice(-1)) : cellID;
+        // console.log(`id: ${id}`);
+        const x = id % 3;
+        const y = Math.trunc(id / 3);
+        // console.log(`x: ${x}`);
+        // console.log(`y: ${y}`);
+
         console.log(`Marking ${getActivePlayer().name}'s symbol, ${getActivePlayer().symbol} into square at position, x:${x} y:${y}`);
         gameBoard.drawSymbol(x, y, getActivePlayer().symbol);
 
@@ -259,15 +310,16 @@ function GameController(
             }
             break;
         }
-
-        playRound(selectedXY[0], selectedXY[1]);
+        console.log(`AI: ${selectedXY[1] * 3 + selectedXY[0]}`);
+        playRound(selectedXY[1] * 3 + selectedXY[0])
+        // playRound(selectedXY[0], selectedXY[1]);
     }
 
     const getUnmarkedCells = () => {
         const unmarkedCells = [];
         for (let i =  0; i < rows; i++) {
             for (let j = 0; j < columns; j++) {
-                if (board[i][j].getValue() === 0) unmarkedCells.push({ x: j, y: i });
+                if (board[i][j].getValue() === "") unmarkedCells.push({ x: j, y: i });
             }
         }
         return unmarkedCells;
@@ -377,12 +429,10 @@ function GameController(
 
     }
 
-    
-
-    // Initialization at game start
-    printNewRound();
-
     return {
+        initGame,
+        resetGame,
+        startGame,
         playRound,
         getActivePlayer,
         checkGameState
@@ -391,3 +441,11 @@ function GameController(
 }
 
 const game = GameController();
+
+function markCell(e) {
+    if(!(e.target instanceof Element)) return;
+
+    console.log("markCell2");
+    game.playRound(e.target.id);
+}
+
