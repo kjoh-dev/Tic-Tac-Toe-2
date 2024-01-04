@@ -36,6 +36,11 @@ body {
 
 }
 
+#announcer {
+    max-width: 20rem;
+    text-align: center;
+}
+
 #players {
     display: flex;
     flex-direction: column;
@@ -74,3 +79,21 @@ body {
     /* font-size: 4rem; */
 }
 
+#play-button {
+    font-family: 'Chalk', 'Courier New', Courier, monospace;
+    display: flex;
+    justify-content: center;
+    border: none;
+    transition-duration: 0.15s;
+
+    background-color: white;
+    font-size: 4.5rem;
+    height: 85%;
+}
+
+#play-button:hover {
+    font-size: 6rem;    
+    height: 100%;
+}
+
+/* #play-button: */
