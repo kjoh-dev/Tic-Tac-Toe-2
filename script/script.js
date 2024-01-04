@@ -114,6 +114,7 @@ function GameController() {
     let aiDelayTime = 1500;
     let players;
     let activePlayer;
+    const playButton = document.getElementById("play-button");
 
     const setPlayers = (playerOneName = "PlayerOne", playerTwoName = "AI") => {
         players = [
@@ -142,17 +143,21 @@ function GameController() {
 
         setPlayers();
         setDifficulty();
+
+        playButton.addEventListener("click", playGame, { once: true });
     };
 
     const resetGame = () => {
         gameBoard.resetBoard();
+
     };
     
     const startGame = (playerOneName, playerTwoName, difficulty) => {
         setPlayers(playerOneName, playerTwoName);
         setDifficulty(difficulty);
-            
-        // Initialization at game start
+        playButton.style.display = "none";
+        playButton.addEventListener("click", newGame, { once: true });
+
         printNewRound();
     };
 
@@ -172,6 +177,8 @@ function GameController() {
         gameBoard.printBoard();
         if (gameState === "TIE") console.log(`It's a ${gameState}!`);
         else console.log(`${getActivePlayer().name} has WON!`);
+
+        playButton.style.display = "block";
     };
 
     const playRound = (cellID) => {
@@ -193,6 +200,8 @@ function GameController() {
         const gameState = checkGameState(x,y);
         if (gameState !== "ONGOING"){
             printGameover(gameState);
+            playButton.style.display = "block";
+
         } else {
             switchPlayerTurn();
             printNewRound();
@@ -431,8 +440,8 @@ function GameController() {
 
     initGame();
 
+
     return {
-        // initGame,
         resetGame,
         startGame,
         playRound,
@@ -445,18 +454,22 @@ function GameController() {
 const game = GameController();
 
 function markCell(e) {
-    if(!(e.target instanceof Element)) return;
-    game.playRound(e.target.id);
+    const elem = e.target;
+    if(!(elem instanceof Element)) return;
+    game.playRound(elem.id);
 }
 
-// function playButton(e) {
-//     if(!(e.target instanceof Element)) return;
+function playGame(e) {
+    const elem = e.target;
+    if(!(elem instanceof Element)) return;
 
-//     if(getComputedStyle(e, null).display === "none"){
-//         // set display to "block"
-//         // game.resetGame
-//     } else {
-//         game.startGame();
-//     }
-// }
+    game.startGame();
+}
 
+function newGame(e) {
+    const elem = e.target;
+    if(!(elem instanceof Element)) return;
+
+    game.resetGame();
+    game.startGame();
+}
