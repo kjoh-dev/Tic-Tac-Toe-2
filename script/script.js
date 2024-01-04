@@ -429,8 +429,10 @@ function GameController() {
 
     }
 
+    initGame();
+
     return {
-        initGame,
+        // initGame,
         resetGame,
         startGame,
         playRound,
@@ -444,8 +446,17 @@ const game = GameController();
 
 function markCell(e) {
     if(!(e.target instanceof Element)) return;
-
-    console.log("markCell2");
     game.playRound(e.target.id);
 }
+
+// function playButton(e) {
+//     if(!(e.target instanceof Element)) return;
+
+//     if(getComputedStyle(e, null).display === "none"){
+//         // set display to "block"
+//         // game.resetGame
+//     } else {
+//         game.startGame();
+//     }
+// }
 
