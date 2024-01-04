@@ -5,32 +5,36 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="style/style.css" rel="stylesheet">
-    <script src="script/script.js"></script>
+    <script src="script/script.js" defer></script>
     <title>Tic-Tac-Toe</title>
   </head>
   <body>
     <h1>Tic-Tac-Toe</h1>
     <section id="board">
-      <div class="cell" id="cell-0"> </div>
-      <div class="cell" id="cell-1"> </div>
-      <div class="cell" id="cell-2"> </div>
-      <div class="cell" id="cell-3"> </div>
-      <div class="cell" id="cell-4"> </div>
-      <div class="cell" id="cell-5"> </div>
-      <div class="cell" id="cell-6"> </div>
-      <div class="cell" id="cell-7"> </div>
-      <div class="cell" id="cell-8"> </div>
+      <div class="cell" id="cell-0"></div>
+      <div class="cell" id="cell-1"></div>
+      <div class="cell" id="cell-2"></div>
+      <div class="cell" id="cell-3"></div>
+      <div class="cell" id="cell-4"></div>
+      <div class="cell" id="cell-5"></div>
+      <div class="cell" id="cell-6"></div>
+      <div class="cell" id="cell-7"></div>
+      <div class="cell" id="cell-8"></div>
+    </section>
+    <section>
+      <p id="announcer">Set Players and Press Play</p>
     </section>
     <section id="players">
-      <div id="player-1">
-        <div id="x-symbol"></div>
-        <div id="x-name">Player</div>
+      <div id="player-x">
+        <div id="x-symbol">X&nbsp;</div>
+        <div id="x-name"> --> Player</div>
       </div>
-      <div id="player-2">
-        <div id="o-symbol"></div>
-        <div id="o-name">Bot</div>
+      <div id="player-o">
+        <div id="o-symbol">O&nbsp;</div>
+        <div id="o-name"> --> Bot</div>
       </div>
     </section>
+    <button id="play-button" type="button">PLAY&excl;</button>
 
   </body>
 </html>
