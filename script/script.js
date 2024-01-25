@@ -114,7 +114,12 @@ function GameController() {
     let aiDelayTime = 1500;
     let players;
     let activePlayer;
+    let isBoardLocked;
     const playButton = document.getElementById("play-button");
+
+    const checkBoardState = () => {
+        return isBoardLocked;
+    };
 
     const setPlayers = (playerOneName = "PlayerOne", playerTwoName = "AI") => {
         players = [
@@ -128,7 +133,6 @@ function GameController() {
             }
         ];
         activePlayer = players[0];
-
     };
 
     const setDifficulty = (difficulty = "Hard") => {
@@ -144,6 +148,7 @@ function GameController() {
         setPlayers();
         setDifficulty();
 
+        isBoardLocked = true;
         playButton.addEventListener("click", playGame, { once: true });
     };
 
@@ -159,6 +164,9 @@ function GameController() {
         playButton.addEventListener("click", newGame, { once: true });
 
         printNewRound();
+
+        isBoardLocked = getActivePlayer() === "AI" ? true : false;
+        console.log(`isBoardLocked 2: ${isBoardLocked}`);
     };
 
     const switchPlayerTurn = () => {
@@ -199,6 +207,7 @@ function GameController() {
         // If not, proceed to next turn.
         const gameState = checkGameState(x,y);
         if (gameState !== "ONGOING"){
+            isBoardLocked = true;
             printGameover(gameState);
             playButton.style.display = "block";
 
@@ -207,7 +216,10 @@ function GameController() {
             printNewRound();
 
             if (activePlayer.name === "AI"){
+                isBoardLocked = true;
                 setTimeout(() => { AIPlayRound(difficulty); }, aiDelayTime);
+            } else {
+                isBoardLocked = false;
             }
         }
     };
@@ -446,7 +458,8 @@ function GameController() {
         startGame,
         playRound,
         getActivePlayer,
-        checkGameState
+        checkGameState,
+        checkBoardState
     };
 
 }
@@ -455,6 +468,11 @@ const game = GameController();
 
 function markCell(e) {
     const elem = e.target;
+    console.log(`isBoardLocked: ${game.checkBoardState()}`);
+    if(game.checkBoardState()){
+        console.log("locked!");
+        return;
+    } 
     if(!(elem instanceof Element)) return;
     game.playRound(elem.id);
 }
