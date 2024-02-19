@@ -116,19 +116,21 @@ function GameController() {
     let activePlayer;
     let isBoardLocked;
     const playButton = document.getElementById("play-button");
+    const xPlayerButton = document.getElementById("x-name");
+    const oPlayerButton = document.getElementById("o-name");
 
     const checkBoardState = () => {
         return isBoardLocked;
     };
 
-    const setPlayers = (playerOneName = "PlayerOne", playerTwoName = "AI") => {
+    const setPlayers = () => {
         players = [
             {
-                name: playerOneName,
+                name: xPlayerButton.textContent.replace("--> ","").trim(),
                 symbol: "X"
             },
             {
-                name: playerTwoName,
+                name: oPlayerButton.textContent.replace("--> ","").trim(),
                 symbol: "O"
             }
         ];
@@ -150,6 +152,15 @@ function GameController() {
 
         isBoardLocked = true;
         playButton.addEventListener("click", playGame, { once: true });
+        xPlayerButton.addEventListener("click", togglePlayerType);
+        oPlayerButton.addEventListener("click", togglePlayerType);
+    };
+
+    const togglePlayerType = (e) => {
+        const elem = e.target;
+        if(!(elem instanceof Element)) return;
+
+        elem.textContent = elem.textContent === "--> Player" ? "--> Bot" : "--> Player";
     };
 
     const resetGame = () => {
@@ -157,21 +168,34 @@ function GameController() {
 
     };
     
-    const startGame = (playerOneName, playerTwoName, difficulty) => {
-        setPlayers(playerOneName, playerTwoName);
+    const startGame = (difficulty) => {
+        setPlayers();
         setDifficulty(difficulty);
         playButton.style.display = "none";
         playButton.addEventListener("click", newGame, { once: true });
+        xPlayerButton.removeEventListener("click", togglePlayerType);
+        oPlayerButton.removeEventListener("click", togglePlayerType);
 
         printNewRound();
 
-        isBoardLocked = getActivePlayer() === "AI" ? true : false;
+        isBoardLocked = getActivePlayer() === "Bot" ? true : false;
+        console.log(`player 1: ${players[0].name} \nplayer 2: ${players[1].name}`);
+        console.log(`current player: ${activePlayer.name}`);
         console.log(`isBoardLocked 2: ${isBoardLocked}`);
     };
 
     const switchPlayerTurn = () => {
-        activePlayer = activePlayer === players[0] ? players[1] :
+        activePlayer = activePlayer.name === players[0].name ? players[1] :
         players[0];
+        console.log(`activePlayer: ${activePlayer.name}\n equal to "Bot"? ${activePlayer.name === "Bot"}`);
+        if (activePlayer.name === "Bot"){
+            isBoardLocked = true;
+            console.log(`1 new board state - locked? ${isBoardLocked}`);
+            setTimeout(() => { AIPlayRound(difficulty); }, aiDelayTime);
+        } else {
+            isBoardLocked = false;
+            console.log(`2 new board state - locked? ${isBoardLocked}`);
+        }
     };
 
     const getActivePlayer = () => activePlayer;
@@ -210,17 +234,19 @@ function GameController() {
             isBoardLocked = true;
             printGameover(gameState);
             playButton.style.display = "block";
-
+            xPlayerButton.removeEventListener("click", togglePlayerType);
+            oPlayerButton.removeEventListener("click", togglePlayerType);
         } else {
+            console.log("switch player turn");
             switchPlayerTurn();
             printNewRound();
 
-            if (activePlayer.name === "AI"){
-                isBoardLocked = true;
-                setTimeout(() => { AIPlayRound(difficulty); }, aiDelayTime);
-            } else {
-                isBoardLocked = false;
-            }
+            // if (activePlayer.name === "Bot"){
+            //     isBoardLocked = true;
+            //     setTimeout(() => { AIPlayRound(difficulty); }, aiDelayTime);
+            // } else {
+            //     isBoardLocked = false;
+            // }
         }
     };
 
