@@ -179,6 +179,7 @@ function GameController() {
         printNewRound();
 
         isBoardLocked = getActivePlayer() === "Bot" ? true : false;
+        if(getActivePlayer().name === "Bot") AIPlayRound(difficulty);
         console.log(`player 1: ${players[0].name} \nplayer 2: ${players[1].name}`);
         console.log(`current player: ${activePlayer.name}`);
         console.log(`isBoardLocked 2: ${isBoardLocked}`);
