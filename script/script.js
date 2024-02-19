@@ -111,13 +111,14 @@ function GameController() {
     let board;
     let rows;
     let columns;
-    let aiDelayTime = 1500;
+    let aiDelayTime = 1000;
     let players;
     let activePlayer;
     let isBoardLocked;
     const playButton = document.getElementById("play-button");
     const xPlayerButton = document.getElementById("x-name");
     const oPlayerButton = document.getElementById("o-name");
+    const announcer = document.getElementById("announcer");
 
     const checkBoardState = () => {
         return isBoardLocked;
@@ -173,10 +174,10 @@ function GameController() {
         setDifficulty(difficulty);
         playButton.style.display = "none";
         playButton.addEventListener("click", newGame, { once: true });
-        xPlayerButton.removeEventListener("click", togglePlayerType);
-        oPlayerButton.removeEventListener("click", togglePlayerType);
         xPlayerButton.style.cursor = "default";
         oPlayerButton.style.cursor = "default";
+        xPlayerButton.removeEventListener("click", togglePlayerType);
+        oPlayerButton.removeEventListener("click", togglePlayerType);
 
         printNewRound();
 
@@ -203,17 +204,28 @@ function GameController() {
 
     const printNewRound = () => {
         gameBoard.printBoard();
-        console.log(`${getActivePlayer().name}'s turn.`);
+        announce(`${getActivePlayer().name}-${getActivePlayer().symbol}'s turn.`);
     };
 
     const printGameover = (gameState) => {
         gameBoard.printBoard();
-        if (gameState === "TIE") console.log(`It's a ${gameState}!`);
-        else console.log(`${getActivePlayer().name} has WON!`);
+        // if (gameState === "TIE") console.log(`It's a ${gameState}!`);
+        if (gameState === "TIE") {
+            announce(`It's a ${gameState}!`);
+        }
+        else {
+            announce(`${getActivePlayer().name}-${getActivePlayer().symbol} has WON!`);
+        } 
+        playButton.textContent = "Again?";
 
         playButton.style.display = "block";
         xPlayerButton.style.cursor = "pointer";
         oPlayerButton.style.cursor = "pointer";
+
+    };
+
+    const announce = (announcement) => {
+        announcer.textContent = announcement;
     };
 
     const playRound = (cellID) => {
@@ -237,8 +249,8 @@ function GameController() {
             isBoardLocked = true;
             printGameover(gameState);
             playButton.style.display = "block";
-            xPlayerButton.removeEventListener("click", togglePlayerType);
-            oPlayerButton.removeEventListener("click", togglePlayerType);
+            xPlayerButton.addEventListener("click", togglePlayerType);
+            oPlayerButton.addEventListener("click", togglePlayerType);
         } else {
             console.log("switch player turn");
             switchPlayerTurn();
@@ -362,7 +374,6 @@ function GameController() {
         }
         console.log(`AI: ${selectedXY[1] * 3 + selectedXY[0]}`);
         playRound(selectedXY[1] * 3 + selectedXY[0])
-        // playRound(selectedXY[0], selectedXY[1]);
     }
 
     const getUnmarkedCells = () => {
