@@ -175,6 +175,8 @@ function GameController() {
         playButton.addEventListener("click", newGame, { once: true });
         xPlayerButton.removeEventListener("click", togglePlayerType);
         oPlayerButton.removeEventListener("click", togglePlayerType);
+        xPlayerButton.style.cursor = "default";
+        oPlayerButton.style.cursor = "default";
 
         printNewRound();
 
@@ -191,11 +193,9 @@ function GameController() {
         console.log(`activePlayer: ${activePlayer.name}\n equal to "Bot"? ${activePlayer.name === "Bot"}`);
         if (activePlayer.name === "Bot"){
             isBoardLocked = true;
-            console.log(`1 new board state - locked? ${isBoardLocked}`);
             setTimeout(() => { AIPlayRound(difficulty); }, aiDelayTime);
         } else {
             isBoardLocked = false;
-            console.log(`2 new board state - locked? ${isBoardLocked}`);
         }
     };
 
@@ -212,6 +212,8 @@ function GameController() {
         else console.log(`${getActivePlayer().name} has WON!`);
 
         playButton.style.display = "block";
+        xPlayerButton.style.cursor = "pointer";
+        oPlayerButton.style.cursor = "pointer";
     };
 
     const playRound = (cellID) => {

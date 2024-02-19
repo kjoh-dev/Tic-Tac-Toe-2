@@ -79,6 +79,10 @@ body {
     /* font-size: 4rem; */
 }
 
+#x-name, #o-name {
+    cursor: pointer;
+}
+
 #play-button {
     font-family: 'Chalk', 'Courier New', Courier, monospace;
     display: flex;
@@ -94,6 +98,6 @@ body {
 #play-button:hover {
     font-size: 6rem;    
     height: 100%;
+    cursor: pointer;
 }
 
-/* #play-button: */
