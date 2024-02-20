@@ -57,7 +57,6 @@ function Gameboard() {
                 printedBoard = printedBoard + " " + board[i][j].getValue();
             }
         }
-        console.log(printedBoard);
     }
 
     const getCellAt = (x, y) => {
@@ -78,14 +77,11 @@ function Gameboard() {
 */
 
 function Cell(idNumber){
-    // let value = 0;
     const cellElem = document.getElementById("cell-" + idNumber);
     cellElem.addEventListener("click", markCell);
-    // cellEvent.addEventListener("click", () => { console.log("clicked"); });
 
     // Accept a player's symbol to change the value of the Cell.
     const addSymbol = (player = "") => {
-        console.log(`player symbol: ${player}`);
         cellElem.innerText = player;
     };
 
@@ -183,15 +179,11 @@ function GameController() {
 
         isBoardLocked = getActivePlayer() === "Bot" ? true : false;
         if(getActivePlayer().name === "Bot") AIPlayRound(difficulty);
-        console.log(`player 1: ${players[0].name} \nplayer 2: ${players[1].name}`);
-        console.log(`current player: ${activePlayer.name}`);
-        console.log(`isBoardLocked 2: ${isBoardLocked}`);
     };
 
     const switchPlayerTurn = () => {
         activePlayer = activePlayer.symbol === players[0].symbol ? players[1] :
         players[0];
-        console.log(`activePlayer: ${activePlayer.name}\n equal to "Bot"? ${activePlayer.name === "Bot"}`);
         if (activePlayer.name === "Bot"){
             isBoardLocked = true;
             setTimeout(() => { AIPlayRound(difficulty); }, aiDelayTime);
@@ -209,7 +201,6 @@ function GameController() {
 
     const printGameover = (gameState) => {
         gameBoard.printBoard();
-        // if (gameState === "TIE") console.log(`It's a ${gameState}!`);
         if (gameState === "TIE") {
             announce(`It's a ${gameState}!`);
         }
@@ -229,17 +220,10 @@ function GameController() {
     };
 
     const playRound = (cellID) => {
-        // console.log(cellID instanceof String);
-        // console.log(cellID.slice(-1));
-        // console.log(Number(cellID.slice(-1)));
         const id = typeof cellID === "string" ? Number(cellID.slice(-1)) : cellID;
-        // console.log(`id: ${id}`);
         const x = id % 3;
         const y = Math.trunc(id / 3);
-        // console.log(`x: ${x}`);
-        // console.log(`y: ${y}`);
 
-        console.log(`Marking ${getActivePlayer().name}'s symbol, ${getActivePlayer().symbol} into square at position, x:${x} y:${y}`);
         gameBoard.drawSymbol(x, y, getActivePlayer().symbol);
 
         // Check for winner and so forth. 
@@ -252,16 +236,9 @@ function GameController() {
             xPlayerButton.addEventListener("click", togglePlayerType);
             oPlayerButton.addEventListener("click", togglePlayerType);
         } else {
-            console.log("switch player turn");
             switchPlayerTurn();
             printNewRound();
 
-            // if (activePlayer.name === "Bot"){
-            //     isBoardLocked = true;
-            //     setTimeout(() => { AIPlayRound(difficulty); }, aiDelayTime);
-            // } else {
-            //     isBoardLocked = false;
-            // }
         }
     };
 
@@ -372,7 +349,6 @@ function GameController() {
             }
             break;
         }
-        console.log(`AI: ${selectedXY[1] * 3 + selectedXY[0]}`);
         playRound(selectedXY[1] * 3 + selectedXY[0])
     }
 
@@ -508,9 +484,7 @@ const game = GameController();
 
 function markCell(e) {
     const elem = e.target;
-    console.log(`isBoardLocked: ${game.checkBoardState()}`);
     if(game.checkBoardState()){
-        console.log("locked!");
         return;
     } 
     if(!(elem instanceof Element)) return;
