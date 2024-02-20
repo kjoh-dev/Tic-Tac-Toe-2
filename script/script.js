@@ -189,7 +189,7 @@ function GameController() {
     };
 
     const switchPlayerTurn = () => {
-        activePlayer = activePlayer.name === players[0].name ? players[1] :
+        activePlayer = activePlayer.symbol === players[0].symbol ? players[1] :
         players[0];
         console.log(`activePlayer: ${activePlayer.name}\n equal to "Bot"? ${activePlayer.name === "Bot"}`);
         if (activePlayer.name === "Bot"){
